@@ -1,0 +1,82 @@
+#include "Player.h"
+#include "PowerUp.h"
+#include <iostream>
+#include <iomanip>
+
+// Player bazna klasa
+Player::Player(const std::string& playerName)
+    : name(playerName), score(0), powerUpUsedThisRound(false) {
+}
+
+void Player::addPowerUp(std::shared_ptr<PowerUp> powerUp) {
+    powerUps.push_back(powerUp);
+}
+
+std::shared_ptr<PowerUp> Player::usePowerUp(int index) {
+    if (index >= 0 && index < static_cast<int>(powerUps.size())) {
+        auto powerUp = powerUps[index];
+        powerUps.erase(powerUps.begin() + index);
+        powerUpUsedThisRound = true;
+        return powerUp;
+    }
+    return nullptr;
+}
+
+void Player::displayPowerUps() const {
+    if (powerUps.empty()) {
+        std::cout << "  Nema dostupnih power-upova\n";
+        return;
+    }
+
+    std::cout << "  Dostupni power-upovi:\n";
+    for (size_t i = 0; i < powerUps.size(); ++i) {
+        std::cout << "    " << (i + 1) << ". " << powerUps[i]->getName()
+            << " - " << powerUps[i]->getDescription() << "\n";
+    }
+}
+
+void Player::displayInfo() const {
+    std::cout << name << " [" << getType() << "] - Bodovi: " << score << "\n";
+}
+
+// AggressivePlayer - +50% bodova, -50% vise gubitka
+AggressivePlayer::AggressivePlayer(const std::string& playerName)
+    : Player(playerName) {
+}
+
+void AggressivePlayer::addPoints(int points) {
+    score += static_cast<int>(points * 1.5);
+}
+
+void AggressivePlayer::subtractPoints(int points) {
+    score -= static_cast<int>(points * 1.5);
+    if (score < 0) score = 0;
+}
+
+// DefensivePlayer - normalan dobitak, -50% gubitka
+DefensivePlayer::DefensivePlayer(const std::string& playerName)
+    : Player(playerName) {
+}
+
+void DefensivePlayer::addPoints(int points) {
+    score += points;
+}
+
+void DefensivePlayer::subtractPoints(int points) {
+    score -= static_cast<int>(points * 0.5);
+    if (score < 0) score = 0;
+}
+
+// BalancedPlayer - standardno bodovanje
+BalancedPlayer::BalancedPlayer(const std::string& playerName)
+    : Player(playerName) {
+}
+
+void BalancedPlayer::addPoints(int points) {
+    score += points;
+}
+
+void BalancedPlayer::subtractPoints(int points) {
+    score -= points;
+    if (score < 0) score = 0;
+}
