@@ -1,0 +1,15 @@
+programiranje
+algoritam
+struktura
+nasljedivanje
+polimorfizam
+enkapsulacija
+apstrakcija
+konstruktor
+destruktor
+pokazivac
+referenca
+lambda
+exception
+template
+namespace

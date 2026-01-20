@@ -1,6 +1,10 @@
 #include "Game.h"
 #include "PowerUp.h"
 #include <random>
+#include <fstream>
+#include <algorithm>
+#include <cctype>
+#include <sstream>
 
 Game::Game(int rounds)
     : currentPlayerIndex(0), totalRounds(rounds), currentRound(0),
@@ -20,6 +24,38 @@ Game::~Game() {
 }
 
 void Game::initializeWordList() {
+    std::ifstream file("words.txt");
+    std::vector<std::string> loaded;
+
+    auto trim = [](std::string s) {
+        while (!s.empty() && std::isspace(s.front()))
+            s.erase(s.begin());
+
+        while (!s.empty() && std::isspace(s.back()))
+            s.pop_back();
+
+        return s;
+    };
+
+    if (file.is_open()) {
+        std::string line;
+        while (std::getline(file, line)) {
+            line = trim(line);
+            if (line.empty()) continue;
+            if (!line.empty() && line[0] == '#') continue;
+
+            std::transform(line.begin(), line.end(), line.begin(),
+                [](unsigned char c) { return static_cast<char>(std::toupper(c)); });
+            loaded.push_back(line);
+        }
+        file.close();
+    }
+
+    if (!loaded.empty()) {
+        wordList = std::move(loaded);
+        return;
+    }
+
     wordList = {
         "PROGRAMIRANJE", "ALGORITAM", "STRUKTURA", "NASLJEDIVANJE",
         "POLIMORFIZAM", "ENKAPSULACIJA", "APSTRAKCIJA", "KONSTRUKTOR",
